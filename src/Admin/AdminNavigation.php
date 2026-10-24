@@ -18,6 +18,8 @@ final class AdminNavigation
     public const PAYMENTS = 'payments';
     public const SUPPORT = 'support';
     public const MEMBERS = 'members';
+    public const PLATFORM = 'platform';
+    public const GATEWAYS = 'gateways';
 
     /** The roles of each section, for the controllers' RequiresAdminRole. */
     public const AUDIT_READ = [AdminRole::SUPPORT];
@@ -40,6 +42,8 @@ final class AdminNavigation
     /** Members: support looks an account up; a moderator blocks and unblocks it (ADR-039). */
     public const MEMBERS_READ = [AdminRole::SUPPORT, AdminRole::MODERATOR];
     public const MEMBERS_BLOCK = [AdminRole::MODERATOR];
+    /** Payment gateway accounts (ADR-040) and platform setting overrides: operations only. */
+    public const CONFIGURE = [AdminRole::OPERATIONS];
 
     /**
      * @param list<AdminRole> $held

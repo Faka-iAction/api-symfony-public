@@ -1,4 +1,4 @@
-# Files mirrored from the private Faka-iAction/api-symfony repository at 3e09b1e
+# Files mirrored from the private Faka-iAction/api-symfony repository at b2ae22f
 # by tools/sync-public. Every listed file is replaced on the next sync; files not listed
 # belong to this public repository and are never touched by the mirror.
 .editorconfig
@@ -194,6 +194,7 @@ src/Block/Payment/CashOffer.php
 src/Block/Payment/LedgerBlock.php
 src/Block/Payment/PaymentBlock.php
 src/Block/Payment/PaymentConfirmation.php
+src/Block/Payment/PaymentGatewayBlock.php
 src/Block/Payment/PaymentOperationsBlock.php
 src/Block/Payment/PaymentProcessingBlock.php
 src/Block/Payment/PaymentSettings.php
@@ -203,6 +204,7 @@ src/Block/Payment/ProviderNotificationInbox.php
 src/Block/Payment/ReconciliationBlock.php
 src/Block/Payment/ReconciliationIssues.php
 src/Block/Payment/RefundBlock.php
+src/Block/Payment/RiskLimits.php
 src/Block/Payout/PayoutBlock.php
 src/Block/Payout/PayoutEligibilityBlock.php
 src/Block/Payout/PayoutFigures.php
@@ -236,9 +238,14 @@ src/Command/RunPayoutsCommand.php
 src/Command/SeedDemoDataCommand.php
 src/Command/SetCountryConfigurationCommand.php
 src/Command/ShowCountryConfigurationCommand.php
+src/Config/ConfigSecretBox.php
+src/Config/ConfigSecretUnavailable.php
+src/Config/PlatformSettingDefinitions.php
+src/Config/PlatformSettings.php
 src/Controller/Admin/AdminController.php
 src/Controller/Admin/AdminHomeController.php
 src/Controller/Admin/AuditLogController.php
+src/Controller/Admin/ConfigurationController.php
 src/Controller/Admin/CountryConfigurationController.php
 src/Controller/Admin/MembersController.php
 src/Controller/Admin/ModerationController.php
@@ -341,9 +348,11 @@ src/Entity/ModerationCase.php
 src/Entity/OutboxEvent.php
 src/Entity/ParticipantAction.php
 src/Entity/Payment.php
+src/Entity/PaymentGateway.php
 src/Entity/PaymentRefund.php
 src/Entity/Payout.php
 src/Entity/PayoutRun.php
+src/Entity/PlatformSetting.php
 src/Entity/Playlist.php
 src/Entity/PlaylistItem.php
 src/Entity/ProcessedEvent.php
@@ -471,10 +480,12 @@ src/Repository/ModerationActionRepository.php
 src/Repository/ModerationCaseRepository.php
 src/Repository/OutboxEventRepository.php
 src/Repository/ParticipantActionRepository.php
+src/Repository/PaymentGatewayRepository.php
 src/Repository/PaymentRefundRepository.php
 src/Repository/PaymentRepository.php
 src/Repository/PayoutRepository.php
 src/Repository/PayoutRunRepository.php
+src/Repository/PlatformSettingRepository.php
 src/Repository/PlaylistItemRepository.php
 src/Repository/PlaylistRepository.php
 src/Repository/ProcessedEventRepository.php

@@ -4,6 +4,7 @@ namespace App\Identity\Delivery;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Clock\ClockInterface;
+use App\Config\PlatformSettings;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -27,6 +28,7 @@ final readonly class DailyDeliveryCap
         private ClockInterface $clock,
         #[Autowire(env: 'int:VERIFICATION_DELIVERY_DAILY_CAP')]
         private int $limit,
+        private ?PlatformSettings $platform = null,
     ) {
         throw new \LogicException('Not published: the implementation is private.');
     }

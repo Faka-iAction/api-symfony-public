@@ -2,13 +2,14 @@
 
 namespace App\Payment\Provider;
 
+use App\Block\Payment\PaymentGatewayBlock;
+use App\Entity\PaymentGateway;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * Paystack's keys, from the environment only (PAYSTACK_SECRET_KEY, PAYSTACK_PUBLIC_KEY;
- * both empty by default). With either missing every payment operation fails closed with
- * PAYMENT_PROVIDER_UNAVAILABLE.
+ * Paystack's keys, from the gateway account operators configure in the admin (ADR-040;
+ * PaymentGatewayBlock), never from the environment. Without an active account with both keys
+ * every payment operation fails closed with PAYMENT_PROVIDER_UNAVAILABLE.
  *
  * Collections are sandbox only (decision 25 and TIS 9.7: no provider is called live until
  * live activation is approved). A key of
@@ -28,11 +29,7 @@ class PaystackCredentials
 {
 
     public function __construct(
-        #[Autowire(env: 'PAYSTACK_SECRET_KEY')]
-        #[\SensitiveParameter]
-        private readonly string $secretKey,
-        #[Autowire(env: 'PAYSTACK_PUBLIC_KEY')]
-        private readonly string $publicKey,
+        private readonly ?PaymentGatewayBlock $gateways = null,
         private readonly ?LoggerInterface $logger = null,
     ) {
         throw new \LogicException('Not published: the implementation is private.');

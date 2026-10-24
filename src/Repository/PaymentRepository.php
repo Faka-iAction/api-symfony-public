@@ -5,6 +5,9 @@ namespace App\Repository;
 use App\Block\Action\Participant;
 use App\Doctrine\UtcDateTimeImmutableType;
 use App\Entity\Payment;
+use App\Entity\CreatorProfile;
+use App\Entity\GuestSession;
+use App\Entity\Member;
 use App\Entity\ParticipantAction;
 use App\Payment\PaymentState;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -78,4 +81,23 @@ class PaymentRepository extends ServiceEntityRepository
     {
         throw new \LogicException('Not published: the implementation is private.');
     }
-}
+
+    /**
+     * For the risk limits: how much a payer started or paid since a moment, and how many such
+     * payments there were. Only payments that may still take money or took it count (open and
+     * confirmed); failed and expired ones do not.
+     *
+     * @return array{amountMinor: int, count: int}
+     */
+    public function totalsForPayer(?Member $member, ?GuestSession $guest, \DateTimeImmutable $since): array
+    {
+        throw new \LogicException('Not published: the implementation is private.');
+    }
+
+    /**
+     * For the risk limits: how much was started or paid for one creator since a moment.
+     */
+    public function totalForCreator(CreatorProfile $profile, \DateTimeImmutable $since): int
+    {
+        throw new \LogicException('Not published: the implementation is private.');
+    }}

@@ -2,6 +2,7 @@
 
 namespace App\Block\Payout;
 
+use App\Config\PlatformSettings;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -20,6 +21,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * - SETTLEMENT_CHANGE_HOLD_SECONDS: how long payouts stay on hold after the details change.
  * - SETTLEMENT_ACCOUNT_VALIDATION: whether Paystack's Validate Account (South Africa; needs an identity or registration number) is used when the
  *   creator supplies the document details. Off: every new destination waits for manual review.
+ *
+ * The cool-off, the minimum and the transfer fee can be overridden by operators on the admin's
+ * Platform settings page (PlatformSettings); the legal gate cannot.
  *
  * Not final: the tests change single values (tests/Support/AdjustablePayoutSettings).
  */
@@ -42,6 +46,7 @@ class PayoutSettings
         private readonly int $changeHoldSeconds,
         #[Autowire(env: 'bool:SETTLEMENT_ACCOUNT_VALIDATION')]
         private readonly bool $accountValidation,
+        private readonly ?PlatformSettings $platform = null,
     ) {
         throw new \LogicException('Not published: the implementation is private.');
     }

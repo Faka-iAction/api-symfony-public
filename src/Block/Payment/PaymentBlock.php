@@ -69,6 +69,7 @@ final readonly class PaymentBlock
         private ParticipationBlock $participation,
         private CashBlock $cash,
         private CashReceiptRepository $cashReceipts,
+        private RiskLimits $risk,
     ) {
         throw new \LogicException('Not published: the implementation is private.');
     }

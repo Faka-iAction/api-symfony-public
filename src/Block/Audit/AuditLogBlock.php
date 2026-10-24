@@ -101,6 +101,10 @@ final readonly class AuditLogBlock
     /** An administrator blocked or unblocked a member's account (ADR-039); the reason is the audit reason. */
     public const MEMBER_BLOCKED = 'MEMBER_BLOCKED';
     public const MEMBER_UNBLOCKED = 'MEMBER_UNBLOCKED';
+    /** An operator changed a payment gateway account (ADR-040); never a secret key's value. */
+    public const PAYMENT_GATEWAY_CHANGED = 'PAYMENT_GATEWAY_CHANGED';
+    /** An operator overrode a platform setting or removed the override. */
+    public const PLATFORM_SETTING_CHANGED = 'PLATFORM_SETTING_CHANGED';
 
     public const TARGET_MEMBER = 'Member';
     public const TARGET_MEMBER_IDENTIFIER = 'MemberIdentifier';
@@ -128,6 +132,10 @@ final readonly class AuditLogBlock
     public const TARGET_PAYOUT_RUN = 'PayoutRun';
     public const TARGET_RECONCILIATION_EXCEPTION = 'ReconciliationException';
     public const TARGET_SUPPORT_TICKET = 'SupportTicket';
+    /** A gateway account, named provider/country (paystack/ZA). */
+    public const TARGET_PAYMENT_GATEWAY = 'PaymentGateway';
+    /** A platform setting, by its name. */
+    public const TARGET_PLATFORM_SETTING = 'PlatformSetting';
 
     public function __construct(
         private EntityManagerInterface $entityManager,
