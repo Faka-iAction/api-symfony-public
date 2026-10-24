@@ -1,0 +1,26 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Symfony / PHP
+/vendor/
+/var/
+/public/bundles/
+/.phpunit.cache/
+
+# >>> merged from private api-symfony by tools/sync-public (regenerated on every sync) >>>
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/phpunit.xml
+# <<< merged <<<
