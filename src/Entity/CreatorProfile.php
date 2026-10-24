@@ -138,6 +138,14 @@ class CreatorProfile
         throw new \LogicException('Not published: the implementation is private.');
     }
 
+    /**
+     * @param string|null $storageKey the image's key in FileStorage; null removes the image
+     */
+    public function changeImage(?string $storageKey, \DateTimeImmutable $now): void
+    {
+        throw new \LogicException('Not published: the implementation is private.');
+    }
+
     public function touch(\DateTimeImmutable $now): void
     {
         throw new \LogicException('Not published: the implementation is private.');

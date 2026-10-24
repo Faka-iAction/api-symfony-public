@@ -36,6 +36,12 @@ services:
 
 when@test:
     services:
+        # Uploaded files go to the test cache, never to var/share.
+        App\Storage\FileStorage:
+            autowire: true
+            arguments:
+                $localRoot: '%kernel.cache_dir%/uploads'
+
         # Test doubles live under tests/, which production does not even load.
         App\Tests\Support\InMemoryVerificationCodeSender:
             public: true

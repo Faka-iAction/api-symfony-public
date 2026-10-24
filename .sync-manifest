@@ -1,4 +1,4 @@
-# Files mirrored from the private Faka-iAction/api-symfony repository at b2ae22f
+# Files mirrored from the private Faka-iAction/api-symfony repository at d1c4c9e
 # by tools/sync-public. Every listed file is replaced on the next sync; files not listed
 # belong to this public repository and are never touched by the mirror.
 .editorconfig
@@ -148,6 +148,7 @@ src/Block/Country/ResolvedValue.php
 src/Block/Creator/CreatorDirectoryBlock.php
 src/Block/Creator/CreatorException.php
 src/Block/Creator/CreatorFailure.php
+src/Block/Creator/CreatorImageBlock.php
 src/Block/Creator/CreatorLinkInput.php
 src/Block/Creator/CreatorPage.php
 src/Block/Creator/CreatorProfileBlock.php
@@ -256,6 +257,7 @@ src/Controller/Admin/SupportController.php
 src/Controller/Api/ActionOptionController.php
 src/Controller/Api/CashController.php
 src/Controller/Api/CreatorActionController.php
+src/Controller/Api/CreatorImageController.php
 src/Controller/Api/CreatorMoneyController.php
 src/Controller/Api/CreatorPayoutController.php
 src/Controller/Api/CreatorProfileController.php
@@ -281,6 +283,7 @@ src/Controller/Web/CashReceiptController.php
 src/Controller/Web/CreatorActionController.php
 src/Controller/Web/CreatorAreaController.php
 src/Controller/Web/CreatorHomeController.php
+src/Controller/Web/CreatorImageController.php
 src/Controller/Web/CreatorPageController.php
 src/Controller/Web/CreatorQrController.php
 src/Controller/Web/DiscoverController.php
@@ -289,6 +292,7 @@ src/Controller/Web/FollowingController.php
 src/Controller/Web/GuestConversionController.php
 src/Controller/Web/HealthController.php
 src/Controller/Web/LegalController.php
+src/Controller/Web/MediaController.php
 src/Controller/Web/MemberController.php
 src/Controller/Web/PlaylistController.php
 src/Controller/Web/QrController.php
@@ -507,6 +511,8 @@ src/Security/WebMember.php
 src/Security/WebMemberProvider.php
 src/Security/WebSessionAuthenticator.php
 src/Security/WebSignInEntryPoint.php
+src/Storage/FileStorage.php
+src/Storage/StorageUnavailable.php
 src/Support/Support.php
 src/Twig/DesktopExtension.php
 src/Twig/PaymentWebExtension.php

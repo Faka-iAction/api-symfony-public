@@ -2,6 +2,7 @@
 
 namespace App\Block\Creator;
 
+use App\Web\PublicUrls;
 use App\Entity\CreatorProfile;
 use App\Repository\CreatorLanguageRepository;
 use App\Repository\CreatorLocationRepository;
@@ -17,6 +18,7 @@ final readonly class CreatorViewLoader
         private CreatorLanguageRepository $languages,
         private CreatorLocationRepository $locations,
         private CreatorPublicLinkRepository $links,
+        private PublicUrls $urls,
     ) {
         throw new \LogicException('Not published: the implementation is private.');
     }
