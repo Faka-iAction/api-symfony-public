@@ -1,0 +1,6 @@
+framework:
+    mailer:
+        # One-time sign-in codes by email (App\Identity\Delivery\EmailVerificationCodeSender).
+        # No provider is chosen: the DSN alone selects one (README, "Delivering one-time
+        # codes"). null://null sends nothing. The From address is VERIFICATION_EMAIL_FROM.
+        dsn: '%env(MAILER_DSN)%'

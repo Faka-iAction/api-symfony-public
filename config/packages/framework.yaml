@@ -1,0 +1,55 @@
+# see https://symfony.com/doc/current/reference/configuration/framework.html
+framework:
+    secret: '%env(APP_SECRET)%'
+
+    # Note that the session will be started ONLY if you read or write from it: the public
+    # pages never start one; sign-in and the signed-in pages do.
+    # Symfony's default (native file) storage is kept here for local development.
+    # Production stores web sessions in Valkey so that application nodes stay stateless
+    # (when@prod below). The cookie is HttpOnly, SameSite=Lax and Secure. Secure is relaxed only in dev and
+    # test, and there only for a request that did not arrive over HTTPS ("auto").
+    session:
+        name: faka_session
+        cookie_secure: true
+        cookie_httponly: true
+        cookie_samesite: lax
+        cookie_lifetime: 0
+
+    # The public web forms use stateless CSRF protection: the request must come from this
+    # site's own origin (Sec-Fetch-Site, Origin or Referer), so no session cookie is needed.
+    # The guest cookie stays the only state a guest's browser holds.
+    # Every other token id (sign-in, sign-out and the signed-in forms, App\Web\WebCsrf) is
+    # a session-based token: a random value kept in the member's server-side session.
+    csrf_protection:
+        stateless_token_ids:
+            # App\Controller\Web\ActionPageController::CSRF_TOKEN_ID
+            - web_participation
+            # App\Controller\Web\ReportController::CSRF_TOKEN_ID: a guest's report form
+            - web_report
+            # App\Controller\Web\SupportController::CSRF_TOKEN_ID: a guest's support forms
+            - web_support
+
+    #esi: true
+    #fragments: true
+
+when@dev:
+    framework:
+        session:
+            cookie_secure: auto
+
+when@prod:
+    framework:
+        session:
+            # A redis:// DSN: Symfony builds the Redis session handler from it. Sessions
+            # expire after session.gc_maxlifetime of inactivity, as with the file handler.
+            handler_id: '%env(SESSION_DSN)%'
+
+when@test:
+    framework:
+        test: true
+        # With debug on, Symfony would add "X-Robots-Tag: noindex" to every response. Off
+        # here, as in production, so the tests see which pages ask not to be indexed.
+        disallow_search_engine_index: false
+        session:
+            storage_factory_id: session.storage.factory.mock_file
+            cookie_secure: auto

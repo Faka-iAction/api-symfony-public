@@ -1,0 +1,67 @@
+framework:
+    messenger:
+        # A message that has used up its retries is kept here for an operator
+        # (messenger:failed:show, messenger:failed:retry). Nothing is lost without it: the
+        # outbox row is the durable record of an event, and the payment sweeps
+        # (app:payments:process) send a refund whose event was lost. The failure transport
+        # only makes such failures visible. A one-time code stays sealed in it, and a retry
+        # after the code's expiry sends nothing.
+        failure_transport: failed
+
+        transports:
+            failed:
+                dsn: '%env(MESSENGER_FAILURE_TRANSPORT_DSN)%'
+
+            # https://symfony.com/doc/current/messenger.html#transport-configuration
+            # The DSN comes from the environment. Production points it at Valkey, which only
+            # carries delivery: the durable record of events is the outbox in MySQL.
+            # symfony/redis-messenger provides that transport; the DSN form is documented in .env.
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                # A consumer that fails is retried with backoff and jitter, a bounded number
+                # of times (events/README.md, "Retries"). After the last retry the message
+                # goes to the failure transport above.
+                retry_strategy:
+                    max_retries: 5
+                    delay: 1000
+                    multiplier: 2
+                    max_delay: 60000
+                    jitter: 0.1
+
+        routing:
+            # Domain events published by app:outbox:relay. The outbox row, not the transport,
+            # is the durable record; delivery is at least once.
+            'App\Outbox\DomainEventMessage': async
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                # Tests must not need a running queue service.
+                async: 'in-memory://'
+                failed: 'in-memory://'
+
+# One-time code delivery (src/Identity/Delivery). Its own transport, so that a code is never
+# queued behind domain events, and a retry budget well inside the code lifetime: 3 retries
+# after about 2 s, 6 s and 18 s, then DeliveryGaveUpListener logs the failure. The message
+# holds the code and the recipient sealed (CodeSealer), never in clear.
+# Declared for dev and prod only: in the test environment the message is not routed, so a
+# test that dispatches it has it handled in place.
+when@dev: &verification_code_delivery
+    framework:
+        messenger:
+            transports:
+                verification_code_delivery:
+                    # Production: a Valkey stream of its own, for example
+                    # redis://valkey.example.invalid:6379/verification-codes (README).
+                    dsn: '%env(VERIFICATION_DELIVERY_TRANSPORT_DSN)%'
+                    retry_strategy:
+                        max_retries: 3
+                        delay: 2000
+                        multiplier: 3
+                        max_delay: 30000
+                        jitter: 0.1
+            routing:
+                'App\Identity\Delivery\Message\DeliverVerificationCode': verification_code_delivery
+
+when@prod: *verification_code_delivery

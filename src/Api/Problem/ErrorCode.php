@@ -1,0 +1,106 @@
+<?php
+
+namespace App\Api\Problem;
+
+use Symfony\Component\HttpFoundation\Response;
+
+/**
+ * The general error codes of the API contract and those of its identity, profile and QR
+ * operations (CONVENTIONS.md, section 8.3).
+ *
+ * A code is added here only once it is in the contract's catalogue, and only when an
+ * implemented operation can return it.
+ */
+enum ErrorCode: string
+{
+    case BAD_REQUEST = 'BAD_REQUEST';
+    case INVALID_PARAMETER = 'INVALID_PARAMETER';
+    case INVALID_CURSOR = 'INVALID_CURSOR';
+    case UNAUTHENTICATED = 'UNAUTHENTICATED';
+    case ACCESS_TOKEN_EXPIRED = 'ACCESS_TOKEN_EXPIRED';
+    case FORBIDDEN = 'FORBIDDEN';
+    case CAPABILITY_REQUIRED = 'CAPABILITY_REQUIRED';
+    case NOT_FOUND = 'NOT_FOUND';
+    case METHOD_NOT_ALLOWED = 'METHOD_NOT_ALLOWED';
+    case CONFLICT = 'CONFLICT';
+    case IDEMPOTENCY_KEY_REUSED = 'IDEMPOTENCY_KEY_REUSED';
+    case IDEMPOTENCY_REQUEST_IN_PROGRESS = 'IDEMPOTENCY_REQUEST_IN_PROGRESS';
+    case VALIDATION_FAILED = 'VALIDATION_FAILED';
+    case RATE_LIMITED = 'RATE_LIMITED';
+    case INTERNAL_ERROR = 'INTERNAL_ERROR';
+    case SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE';
+
+    case INVALID_CREDENTIALS = 'INVALID_CREDENTIALS';
+    case REFRESH_TOKEN_INVALID = 'REFRESH_TOKEN_INVALID';
+    case VERIFICATION_FAILED = 'VERIFICATION_FAILED';
+    case IDENTIFIER_NOT_AVAILABLE = 'IDENTIFIER_NOT_AVAILABLE';
+    case LAST_IDENTIFIER = 'LAST_IDENTIFIER';
+    case IDENTIFIER_NOT_FOUND = 'IDENTIFIER_NOT_FOUND';
+    case CREATOR_PROFILE_EXISTS = 'CREATOR_PROFILE_EXISTS';
+    case HANDLE_TAKEN = 'HANDLE_TAKEN';
+    case CREATOR_PROFILE_NOT_FOUND = 'CREATOR_PROFILE_NOT_FOUND';
+    case CREATOR_NOT_FOUND = 'CREATOR_NOT_FOUND';
+    case QR_NOT_FOUND = 'QR_NOT_FOUND';
+    case SOCIAL_PROVIDER_UNAVAILABLE = 'SOCIAL_PROVIDER_UNAVAILABLE';
+    case IDEMPOTENCY_KEY_REQUIRED = 'IDEMPOTENCY_KEY_REQUIRED';
+
+    case CREATOR_ACTION_NOT_FOUND = 'CREATOR_ACTION_NOT_FOUND';
+    case CREATOR_ACTION_STATE_CONFLICT = 'CREATOR_ACTION_STATE_CONFLICT';
+    case CREATOR_ACTION_NOT_PUBLISHABLE = 'CREATOR_ACTION_NOT_PUBLISHABLE';
+    case ACTION_SLUG_TAKEN = 'ACTION_SLUG_TAKEN';
+    case OPTION_NOT_FOUND = 'OPTION_NOT_FOUND';
+    case OPTION_IN_USE = 'OPTION_IN_USE';
+    case PLAYLIST_NOT_FOUND = 'PLAYLIST_NOT_FOUND';
+    case PLAYLIST_ITEM_NOT_FOUND = 'PLAYLIST_ITEM_NOT_FOUND';
+    case PLAYLIST_NAME_TAKEN = 'PLAYLIST_NAME_TAKEN';
+    case PLAYLIST_IN_USE = 'PLAYLIST_IN_USE';
+
+    case GUEST_TOKEN_INVALID = 'GUEST_TOKEN_INVALID';
+    case GUEST_NOT_ALLOWED = 'GUEST_NOT_ALLOWED';
+    case PARTICIPATION_DECLINED = 'PARTICIPATION_DECLINED';
+    case CREATOR_ACTION_NOT_OPEN = 'CREATOR_ACTION_NOT_OPEN';
+    case ACTION_CONFIG_CHANGED = 'ACTION_CONFIG_CHANGED';
+    case PARTICIPATION_LIMIT_REACHED = 'PARTICIPATION_LIMIT_REACHED';
+    case OPTION_UNAVAILABLE = 'OPTION_UNAVAILABLE';
+    case ACTION_NOT_FOUND = 'ACTION_NOT_FOUND';
+    case ACTION_STATE_CONFLICT = 'ACTION_STATE_CONFLICT';
+    case ACTION_NOT_CANCELLABLE = 'ACTION_NOT_CANCELLABLE';
+    case PAYMENT_PROVIDER_UNAVAILABLE = 'PAYMENT_PROVIDER_UNAVAILABLE';
+    case TRANSACTION_LIMIT_EXCEEDED = 'TRANSACTION_LIMIT_EXCEEDED';
+    case ACTION_NOT_PAYABLE = 'ACTION_NOT_PAYABLE';
+    case PAYMENT_ALREADY_IN_PROGRESS = 'PAYMENT_ALREADY_IN_PROGRESS';
+    case PAYMENT_METHOD_NOT_AVAILABLE = 'PAYMENT_METHOD_NOT_AVAILABLE';
+    case PAYMENT_NOT_FOUND = 'PAYMENT_NOT_FOUND';
+    case RECEIPT_NOT_AVAILABLE = 'RECEIPT_NOT_AVAILABLE';
+    case BID_NOT_RAISABLE = 'BID_NOT_RAISABLE';
+    case CASH_NOT_AVAILABLE = 'CASH_NOT_AVAILABLE';
+    case CASH_RECEIPT_NOT_FOUND = 'CASH_RECEIPT_NOT_FOUND';
+    case CASH_RECEIPT_STATE_CONFLICT = 'CASH_RECEIPT_STATE_CONFLICT';
+
+    case RECENT_SIGN_IN_REQUIRED = 'RECENT_SIGN_IN_REQUIRED';
+    case SETTLEMENT_ONBOARDING_NOT_AVAILABLE = 'SETTLEMENT_ONBOARDING_NOT_AVAILABLE';
+    case SETTLEMENT_DETAILS_REJECTED = 'SETTLEMENT_DETAILS_REJECTED';
+    case SETTLEMENT_DETAILS_NOT_VERIFIED = 'SETTLEMENT_DETAILS_NOT_VERIFIED';
+
+    public function status(): int
+    {
+        throw new \LogicException('Not published: the implementation is private.');
+    }
+
+    /**
+     * Text sent as `detail` when the code is raised without a more specific one.
+     */
+    public function defaultDetail(): string
+    {
+        throw new \LogicException('Not published: the implementation is private.');
+    }
+
+    /**
+     * The envelope's `title` (CONVENTIONS.md, section 8.1): the HTTP reason phrase of the
+     * status, except for the two codes the contract gives a title of their own.
+     */
+    public function title(): string
+    {
+        throw new \LogicException('Not published: the implementation is private.');
+    }
+}

@@ -1,0 +1,43 @@
+# Payments (src/Payment, src/Block/Payment): the provider adapter and its HTTP client.
+# Paystack, sandbox only (decision 25); keys and settings are in .env.
+# Kept in its own file so that config/services.yaml is not rewritten.
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    payments.paystack_http_client: '@http_client'
+    App\Payment\Provider\PaymentProvider: '@App\Payment\Provider\PaystackProvider'
+    # Payouts (decisions 26 and 27): transfers to creators' bank accounts, behind the legal gate.
+    App\Payment\Provider\PayoutProvider: '@App\Payment\Provider\PaystackPayouts'
+
+when@test:
+    services:
+        _defaults:
+            autowire: true
+            autoconfigure: true
+        # The tests never reach Paystack: a MockHttpClient answers with the response shapes
+        # of Paystack's documentation (tests/Support/PaystackSandbox).
+        App\Tests\Support\PaystackSandbox:
+            public: true
+        payments.paystack_http_client: '@App\Tests\Support\PaystackSandbox'
+        # Decorates (rather than replaces) the credentials: config/services.yaml registers
+        # every class under src/ after this file is read, and would undo a replacement.
+        App\Tests\Support\SwitchablePaystackCredentials:
+            public: true
+            decorates: App\Payment\Provider\PaystackCredentials
+            arguments:
+                $secretKey: 'test-only-paystack-secret-placeholder'
+                $publicKey: 'test-only-paystack-public-placeholder'
+        # The payout settings of .env, with values a test may change (minimum, fee, gate).
+        App\Tests\Support\AdjustablePayoutSettings:
+            public: true
+            decorates: App\Block\Payout\PayoutSettings
+
+# A stored provider notification is processed by a worker, never inside the webhook
+# request. The stored row, not the transport, is the durable record. In the test
+# environment the async transport is in memory, so tests process the inbox themselves.
+framework:
+    messenger:
+        routing:
+            'App\Payment\Message\ProcessProviderNotification': async

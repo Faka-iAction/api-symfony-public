@@ -1,0 +1,16 @@
+framework:
+    notifier:
+        chatter_transports:
+        texter_transports:
+            # One-time sign-in codes by SMS (App\Identity\Delivery\SmsVerificationCodeSender).
+            # No provider is chosen: the DSN alone selects one, once its bridge package is
+            # installed (README, "Delivering one-time codes"). null://null sends nothing.
+            sms: '%env(SMS_DSN)%'
+        channel_policy:
+            # use chat/slack, chat/telegram, sms/twilio or sms/vonage
+            urgent: ['email']
+            high: ['email']
+            medium: ['email']
+            low: ['email']
+        admin_recipients:
+            - { email: admin@example.com }

@@ -1,0 +1,64 @@
+framework:
+    rate_limiter:
+        # The limits come from the environment. The defaults in .env are conservative
+        # placeholders: the contract has not decided the numbers or what they are keyed on
+        # (CONVENTIONS.md, section 14, item 37).
+        #
+        # State is kept in the "cache.rate_limiter" pool, which uses the application cache:
+        # the filesystem locally, Valkey in production, where every node must see the same counts.
+        api_anonymous:
+            policy: sliding_window
+            limit: '%env(int:RATE_LIMIT_API_ANONYMOUS_LIMIT)%'
+            interval: '%env(RATE_LIMIT_API_ANONYMOUS_INTERVAL)%'
+        # Registration, one-time codes, sign-in and token refresh: the routes marked with
+        # App\Api\ApiRoute::AUTHENTICATION_LIMITED. Counted on top of api_anonymous.
+        api_authentication:
+            policy: sliding_window
+            limit: '%env(int:RATE_LIMIT_API_AUTHENTICATION_LIMIT)%'
+            interval: '%env(RATE_LIMIT_API_AUTHENTICATION_INTERVAL)%'
+        # Guest-session creation and participation: the routes marked with
+        # App\Api\ApiRoute::PARTICIPATION_LIMITED. Counted on top of api_anonymous.
+        api_participation:
+            policy: sliding_window
+            limit: '%env(int:RATE_LIMIT_API_PARTICIPATION_LIMIT)%'
+            interval: '%env(RATE_LIMIT_API_PARTICIPATION_INTERVAL)%'
+        # The web form submissions of guests (a Request, a Vote or a Shout-out), keyed on
+        # the client address. Applied by the web controller, which answers with a page.
+        web_participation:
+            policy: sliding_window
+            limit: '%env(int:RATE_LIMIT_WEB_PARTICIPATION_LIMIT)%'
+            interval: '%env(RATE_LIMIT_WEB_PARTICIPATION_INTERVAL)%'
+        # Reports filed through the web report form (architecture 28), members and guests
+        # alike, keyed on the client address.
+        web_report:
+            policy: sliding_window
+            limit: '%env(int:RATE_LIMIT_WEB_REPORT_LIMIT)%'
+            interval: '%env(RATE_LIMIT_WEB_REPORT_INTERVAL)%'
+        # Support tickets and messages sent through the web (architecture 29), members and
+        # guests alike, keyed on the client address.
+        web_support:
+            policy: sliding_window
+            limit: '%env(int:RATE_LIMIT_WEB_SUPPORT_LIMIT)%'
+            interval: '%env(RATE_LIMIT_WEB_SUPPORT_INTERVAL)%'
+
+when@test:
+    framework:
+        rate_limiter:
+            # Kept in memory, per kernel: tests need no cache service and cannot use up
+            # each other's quota.
+            api_anonymous:
+                storage_service: app.rate_limiter.storage.in_memory
+            api_authentication:
+                storage_service: app.rate_limiter.storage.in_memory
+            api_participation:
+                storage_service: app.rate_limiter.storage.in_memory
+            web_participation:
+                storage_service: app.rate_limiter.storage.in_memory
+            web_report:
+                storage_service: app.rate_limiter.storage.in_memory
+            web_support:
+                storage_service: app.rate_limiter.storage.in_memory
+
+    services:
+        app.rate_limiter.storage.in_memory:
+            class: Symfony\Component\RateLimiter\Storage\InMemoryStorage

@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+# See also https://symfony.com/doc/current/service_container/import.html
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    app.version: '%env(APP_VERSION)%'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+
+    # No email or SMS provider is chosen yet: nothing is delivered outside the tests.
+    App\Identity\Delivery\VerificationCodeSender: '@App\Identity\Delivery\LoggingVerificationCodeSender'
+
+    App\Identity\Social\SocialIdentityVerifier: '@App\Identity\Social\RoutingSocialIdentityVerifier'
+
+    # Placeholder screening of Shout-out messages (decision 22): a word list from the environment.
+    App\Action\Screening\MessageScreener: '@App\Action\Screening\WordListMessageScreener'
+
+when@test:
+    services:
+        # Test doubles live under tests/, which production does not even load.
+        App\Tests\Support\InMemoryVerificationCodeSender:
+            public: true
+        App\Identity\Delivery\VerificationCodeSender: '@App\Tests\Support\InMemoryVerificationCodeSender'
+
+        App\Tests\Support\FakeSocialIdentityVerifier:
+            public: true
+        App\Identity\Social\SocialIdentityVerifier: '@App\Tests\Support\FakeSocialIdentityVerifier'
+
+        # A pass-through until a test asks for a word to be refused.
+        App\Tests\Support\TestMessageScreener:
+            public: true
+        App\Action\Screening\MessageScreener: '@App\Tests\Support\TestMessageScreener'
+
+        # No contract operation returns a vote tally yet (CONVENTIONS.md item 60); only the
+        # web status page uses this Block. The tests reach it here.
+        App\Block\Action\VoteTallyBlock:
+            autowire: true
+            public: true
+
+        # The UTC session time zone of dev and prod, for a MySQL test database
+        # (TEST_DATABASE_URL); does nothing on SQLite. See config/packages/doctrine.yaml.
+        App\Tests\Support\MySqlUtcSessionMiddleware:
+            tags: [doctrine.middleware]
+
+# One-time code delivery (src/Identity/Delivery, README "Delivering one-time codes"). These
+# replace the logging sender aliased above outside the tests. Prod always queues the code for
+# a worker. Dev queues it only for a channel whose DSN is configured (MAILER_DSN, SMS_DSN)
+# and otherwise keeps the logging sender. The test environment keeps its in-memory sender.
+when@dev:
+    services:
+        App\Identity\Delivery\VerificationCodeSender: '@App\Identity\Delivery\DevVerificationCodeSender'
+
+when@prod:
+    services:
+        App\Identity\Delivery\VerificationCodeSender: '@App\Identity\Delivery\QueuedVerificationCodeSender'

@@ -1,0 +1,11 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    ignoreErrors:
+        # Doctrine assigns the generated key when it inserts a row, and the columns that
+        # only a bulk UPDATE writes when it loads one. PHPStan sees neither without the
+        # phpstan-doctrine extension, which is not installed.
+        -
+            identifier: property.unusedType
+            path: src/Entity/*

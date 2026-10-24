@@ -1,0 +1,56 @@
+security:
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    # The API authenticator loads the member itself and never asks the provider; a firewall
+    # still has to name one. The web firewall loads the member of its session again on
+    # every request, so a member who is no longer active is signed out at once.
+    providers:
+        users_in_memory: { memory: null }
+        web_members:
+            id: App\Security\WebMemberProvider
+
+    firewalls:
+        dev:
+            # Ensure dev tools and static assets are always allowed
+            pattern: ^/(_profiler|_wdt|assets|build)/
+            security: false
+        # Two firewalls because session identity and API tokens are not interchangeable
+        # (architecture 22.3 and 43.1). Neither reads the other's credential.
+        api:
+            pattern: ^/api/
+            stateless: true
+            provider: users_in_memory
+            # Requires a bearer token on every route under /api/ that is not marked public
+            # (App\Api\ApiRoute::PUBLIC), so no access_control rule is needed for it.
+            custom_authenticators:
+                - App\Security\ApiTokenAuthenticator
+        # Server-managed sessions for the signed-in web pages. The sign-in controller proves
+        # who the member is through SignInBlock and logs them in with Security::login(), which
+        # migrates the session (a new session ID). A signed-in page asked for without a
+        # session redirects to the sign-in page. Lazy: public pages never start a session.
+        main:
+            lazy: true
+            provider: web_members
+            custom_authenticators:
+                - App\Security\WebSessionAuthenticator
+            entry_point: App\Security\WebSignInEntryPoint
+
+    # Note: Only the *first* matching rule is applied
+    access_control:
+        # The signed-in web pages: the member area, Following and the creator area. Discover
+        # and Activity are open to guests too and decide for themselves what they show.
+        - { path: ^/(me|creator|following)(/|$), roles: ROLE_MEMBER }
+
+when@test:
+    security:
+        password_hashers:
+            # Password hashers are resource-intensive by design to ensure security.
+            # In tests, it's safe to reduce their cost to improve performance.
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4 # Lowest possible value for bcrypt
+                time_cost: 3 # Lowest possible value for argon
+                memory_cost: 10 # Lowest possible value for argon

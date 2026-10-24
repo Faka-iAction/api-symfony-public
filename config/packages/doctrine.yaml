@@ -1,0 +1,94 @@
+doctrine:
+    dbal:
+        url: '%env(resolve:DATABASE_URL)%'
+
+        # MySQL 8.4 LTS is the one authoritative database (architecture 21.1).
+        server_version: '8.4.0'
+        charset: utf8mb4
+        default_table_options:
+            charset: utf8mb4
+            collation: utf8mb4_0900_ai_ci
+            engine: InnoDB
+        types:
+            # Every timestamp column uses this type: it writes and reads UTC whatever the
+            # time zone of PHP or of the database session.
+            utc_datetime_immutable: App\Doctrine\UtcDateTimeImmutableType
+
+        profiling_collect_backtrace: '%kernel.debug%'
+        use_savepoints: true
+    orm:
+        auto_generate_proxy_classes: true
+        enable_lazy_ghost_objects: true
+        report_fields_where_declared: true
+        validate_xml_mapping: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        auto_mapping: true
+        mappings:
+            App:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Entity'
+                prefix: 'App\Entity'
+                alias: App
+        controller_resolver:
+            auto_mapping: false
+        dql:
+            numeric_functions:
+                # MySQL MATCH ... AGAINST in boolean mode; used on MySQL only.
+                FULLTEXT_MATCH: App\Doctrine\FullTextMatch
+
+# The MySQL session option is set per environment, not in the block above, because the
+# test environment runs on SQLite by default, where the same PDO attribute number means
+# something else and makes the connection fail. An environment added later must repeat it.
+# The test environment gets the same time zone from a middleware instead
+# (App\Tests\Support\MySqlUtcSessionMiddleware), which runs it only on MySQL.
+when@dev:
+    doctrine:
+        dbal:
+            # 1002 is PDO::MYSQL_ATTR_INIT_COMMAND. Timestamps are persisted in UTC, so the
+            # session time zone must not follow the database server's local setting.
+            options:
+                1002: "SET time_zone = '+00:00'"
+
+when@test:
+    parameters:
+        test_database_url.default: 'sqlite:///:memory:'
+
+    doctrine:
+        dbal:
+            # By default the tests run against SQLite in memory and build the schema from the
+            # entity metadata, so they need no database service. That is not evidence that
+            # the migrations or the row locks work on MySQL 8.4.
+            #
+            # TEST_DATABASE_URL, when set, points them at a MySQL 8.4 database instead: the
+            # schema is then built by running the migrations, and the `mysql` test group runs
+            # (see tests/Support/TestDatabase.php and README.md). CI sets it in its MySQL job.
+            #
+            # The URL is not read from DATABASE_URL, so that a local override of the
+            # application's database can never point the tests, which drop tables and
+            # empty them, at it. TestDatabase also refuses a MySQL database whose name does
+            # not end in `_test`. Never put TEST_DATABASE_URL in a committed env file.
+            url: '%env(default:test_database_url.default:TEST_DATABASE_URL)%'
+
+when@prod:
+    doctrine:
+        dbal:
+            options:
+                1002: "SET time_zone = '+00:00'"
+        orm:
+            auto_generate_proxy_classes: false
+            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system
